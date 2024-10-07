@@ -2,6 +2,7 @@ package org.pronet.app.dtos;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.pronet.app.enums.Role;
 
@@ -19,9 +20,8 @@ public class UserDto {
 
     @NotNull(message = "Password cannot be null!")
     @NotBlank(message = "Password cannot be empty!")
+    @Size(min = 8, message = "Password must be minimum 8 characters!")
     private String password;
-
-    @NotNull(message = "Role cannot be empty or null!")
     private Role role;
 
     public UserDto(Long id, String fullName, String username, Role role) {
