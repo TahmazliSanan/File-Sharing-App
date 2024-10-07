@@ -37,6 +37,18 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(FileSizeLimitExceededException.class)
+    public ResponseEntity<ApiResponse> handleFileSizeExceededException(FileSizeLimitExceededException fileSizeLimitExceededException) {
+        ApiResponse response = new ApiResponse(false, fileSizeLimitExceededException.getMessage(), null);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ApiResponse> handleUnauthorizedException(UnauthorizedException unauthorizedException) {
+        ApiResponse response = new ApiResponse(false, unauthorizedException.getMessage(), null);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse> handleGlobalException(Exception exception) {
         ApiResponse response = new ApiResponse(false, exception.getMessage(), null);
