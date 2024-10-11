@@ -27,27 +27,26 @@ public class FileServiceImpl implements FileService {
     public FileDto createFile(Long ownerId, MultipartFile file, List<Long> visibleToUserIdList) {
         if (file.getSize() > MAX_FILE_SIZE) {
             throw new FileSizeLimitExceededException("File size exceeds the 30MB limit!");
-        } else {
-            User owner = userRepository
-                    .findById(ownerId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Owner not found!"));
-            List<User> visibleToUserList = userRepository
-                    .findAllById(visibleToUserIdList);
-            File newFile = new File();
-            newFile.setFileName(file.getOriginalFilename());
-            newFile.setFileSize(file.getSize());
-            newFile.setFilePath("/uploads/" + file.getOriginalFilename());  // Customize this path
-            newFile.setOwner(owner);
-            newFile.setVisibleToUserList(visibleToUserList);
-            fileRepository.save(newFile);
-            return new FileDto(
-                    newFile.getId(),
-                    newFile.getFileName(),
-                    newFile.getFileSize(),
-                    newFile.getFilePath(),
-                    ownerId,
-                    visibleToUserIdList);
         }
+        User owner = userRepository
+                .findById(ownerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Owner not found!"));
+        List<User> visibleToUserList = userRepository
+                .findAllById(visibleToUserIdList);
+        File newFile = new File();
+        newFile.setFileName(file.getOriginalFilename());
+        newFile.setFileSize(file.getSize());
+        newFile.setFilePath("/uploads/" + file.getOriginalFilename());  // Customize this path
+        newFile.setOwner(owner);
+        newFile.setVisibleToUserList(visibleToUserList);
+        fileRepository.save(newFile);
+        return new FileDto(
+                newFile.getId(),
+                newFile.getFileName(),
+                newFile.getFileSize(),
+                newFile.getFilePath(),
+                ownerId,
+                visibleToUserIdList);
     }
 
     @Override
@@ -86,8 +85,7 @@ public class FileServiceImpl implements FileService {
                 .orElseThrow(() -> new ResourceNotFoundException("Owner not found!"));
         if (!foundFile.getOwner().getId().equals(ownerId) && owner.getRole() != Role.Admin) {
             throw new UnauthorizedException("You are not authorized to delete this file!");
-        } else {
-            fileRepository.delete(foundFile);
         }
+        fileRepository.delete(foundFile);
     }
 }
