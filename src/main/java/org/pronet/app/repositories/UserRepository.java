@@ -8,6 +8,7 @@ import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+    User findByUsernameContainingIgnoreCase(String username);
     Boolean existsByUsernameContainingIgnoreCase(String username);
     List<User> findAllByUsernameContainingIgnoreCaseAndIdNot(String username, Long id);
 }
