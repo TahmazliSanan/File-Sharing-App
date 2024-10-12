@@ -27,18 +27,31 @@ public class FileController {
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<ApiResponse> getFileById(@PathVariable(value = "id") Long id) {
+        FileDto foundFile = fileService.getFileById(id);
+        ApiResponse apiResponse = new ApiResponse(true, "File found!", foundFile);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/all")
+    public ResponseEntity<ApiResponse> getFiles() {
+        List<FileDto> fileList = fileService.getFiles();
+        ApiResponse apiResponse = new ApiResponse(true, "File list", fileList);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
     @GetMapping(value = "/user/{userId}")
-    public ResponseEntity<ApiResponse> getFilesVisibleToUser(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse> getFilesVisibleToUser(@PathVariable(value = "userId") Long userId) {
         List<FileDto> filesVisibleToUsers = fileService.getFilesVisibleToUsers(userId);
-        ApiResponse apiResponse = new ApiResponse(true, "Visible files", filesVisibleToUsers);
+        ApiResponse apiResponse = new ApiResponse(true, "Visible file list", filesVisibleToUsers);
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiResponse> deleteFile(
-            @PathVariable Long id,
-            @RequestParam Long ownerId) {
-        fileService.deleteFile(id, ownerId);
+            @PathVariable(value = "id") Long id) {
+        fileService.deleteFile(id);
         return new ResponseEntity<>(new ApiResponse(true, "File deleted successfully!", null), HttpStatus.OK);
     }
 }

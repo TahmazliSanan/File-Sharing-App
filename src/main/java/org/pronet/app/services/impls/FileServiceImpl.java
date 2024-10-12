@@ -4,10 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.pronet.app.dtos.FileDto;
 import org.pronet.app.entities.File;
 import org.pronet.app.entities.User;
-import org.pronet.app.enums.Role;
 import org.pronet.app.exceptions.FileSizeLimitExceededException;
 import org.pronet.app.exceptions.ResourceNotFoundException;
-import org.pronet.app.exceptions.UnauthorizedException;
 import org.pronet.app.repositories.FileRepository;
 import org.pronet.app.repositories.UserRepository;
 import org.pronet.app.services.FileService;
@@ -36,7 +34,7 @@ public class FileServiceImpl implements FileService {
         File newFile = new File();
         newFile.setFileName(file.getOriginalFilename());
         newFile.setFileSize(file.getSize());
-        newFile.setFilePath("/uploads/" + file.getOriginalFilename());  // Customize this path
+        newFile.setFilePath("/uploads/" + file.getOriginalFilename());
         newFile.setOwner(owner);
         newFile.setVisibleToUserList(visibleToUserList);
         fileRepository.save(newFile);
@@ -47,6 +45,43 @@ public class FileServiceImpl implements FileService {
                 newFile.getFilePath(),
                 ownerId,
                 visibleToUserIdList);
+    }
+
+    @Override
+    public FileDto getFileById(Long id) {
+        File foundFile = fileRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("File not found with ID: " + id));
+        return new FileDto(
+                foundFile.getId(),
+                foundFile.getFileName(),
+                foundFile.getFileSize(),
+                foundFile.getFilePath(),
+                foundFile.getOwner().getId(),
+                foundFile
+                        .getVisibleToUserList()
+                        .stream()
+                        .map(User::getId)
+                        .toList());
+    }
+
+    @Override
+    public List<FileDto> getFiles() {
+        List<File> fileList = fileRepository.findAll();
+        return fileList
+                .stream()
+                .map(file -> new FileDto(
+                        file.getId(),
+                        file.getFileName(),
+                        file.getFileSize(),
+                        file.getFilePath(),
+                        file.getOwner().getId(),
+                        file
+                                .getVisibleToUserList()
+                                .stream()
+                                .map(User::getId)
+                                .toList()))
+                .toList();
     }
 
     @Override
@@ -76,16 +111,10 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void deleteFile(Long id, Long ownerId) {
+    public void deleteFile(Long id) {
         File foundFile = fileRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("File not found!"));
-        User owner = userRepository
-                .findById(ownerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Owner not found!"));
-        if (!foundFile.getOwner().getId().equals(ownerId) && owner.getRole() != Role.Admin) {
-            throw new UnauthorizedException("You are not authorized to delete this file!");
-        }
         fileRepository.delete(foundFile);
     }
 }

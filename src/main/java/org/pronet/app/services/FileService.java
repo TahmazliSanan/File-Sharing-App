@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface FileService {
     FileDto createFile(Long ownerId, MultipartFile file, List<Long> visibleToUserIdList);
+    FileDto getFileById(Long id);
+    List<FileDto> getFiles();
     List<FileDto> getFilesVisibleToUsers(Long userId);
-    void deleteFile(Long id, Long ownerId);
+    void deleteFile(Long id);
 }
