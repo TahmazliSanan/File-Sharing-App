@@ -7,6 +7,7 @@ import org.pronet.app.exceptions.ResourceAlreadyExistsException;
 import org.pronet.app.exceptions.ResourceNotFoundException;
 import org.pronet.app.repositories.UserRepository;
 import org.pronet.app.services.UserService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDto createUser(UserDto userDto) {
@@ -23,7 +25,7 @@ public class UserServiceImpl implements UserService {
             User newUser = new User();
             newUser.setFullName(userDto.getFullName());
             newUser.setUsername(userDto.getUsername());
-            newUser.setPassword(userDto.getPassword());
+            newUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
             newUser.setRole(userDto.getRole());
             userRepository.save(newUser);
             return new UserDto(
